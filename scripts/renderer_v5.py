@@ -107,15 +107,16 @@ def extract_structure(md_content):
     current_body_lines = []
     in_conclusion = False
     conclusion_lines = []
-    skip_metadata = True  # Skip metadata lines at top
+    metadata = {}
     
     for line in lines:
         stripped = line.strip()
         
-        # Skip metadata like "design_system: V"
-        if skip_metadata and re.match(r'^[a-z_]+:\s*\S+$', stripped):
-            continue
-        skip_metadata = False
+        # Capture metadata like "theme: vitality"
+        meta_match = re.match(r'^([a-z_]+):\s*(.+)$', line.strip())
+        if meta_match and current_chapter is None:
+             metadata[meta_match.group(1)] = meta_match.group(2).strip()
+             continue
         
         # Main title — # Title
         title_match = re.match(r'^#\s+(.+)$', stripped)
@@ -185,7 +186,7 @@ def extract_structure(md_content):
                 ch['hook'] = hook
                 break
     
-    return title, chapters, conclusion_md
+    return title, chapters, conclusion_md, metadata
 
 
 # ============================================================
@@ -288,12 +289,18 @@ def build_conclusion_html(conclusion_md):
 # ============================================================
 # TEMPLATE ASSEMBLY
 # ============================================================
-def assemble_html(title, chapters, conclusion_md):
+def assemble_html(title, chapters, conclusion_md, metadata):
     """Read the HTML template and fill all slots."""
     template = TEMPLATE_PATH.read_text(encoding='utf-8')
     
-    # Read CSS content and inject directly (file:// links don't work with set_content)
-    css_content = CSS_PATH.read_text(encoding='utf-8')
+    # Theme selection
+    theme = metadata.get('theme', 'premium')
+    theme_css_path = PROJECT_ROOT / "design" / f"system_v5_{theme}.css"
+    if not theme_css_path.exists():
+        theme_css_path = CSS_PATH
+        
+    # Read CSS content and inject directly
+    css_content = theme_css_path.read_text(encoding='utf-8')
     # Strip @import — we'll add it as a <link> separately handled by font loading
     # Actually keep @import inside <style> — Playwright handles it fine
     
@@ -321,8 +328,21 @@ def assemble_html(title, chapters, conclusion_md):
     
     cover_blurb = f"A science-backed framework covering the {len(chapters)} pillars of early childhood cognitive development \u2014 from neural stimulation and language to nutrition, emotional intelligence, and a lifelong love of learning."
     
+    # Cover Image logic
+    cover_image_html = ""
+    if 'cover_image' in metadata:
+        img_path = Path(metadata['cover_image']).resolve()
+        if img_path.exists():
+            # Use absolute path with file:// for local images
+            cover_image_html = f'<div class="cover-image-area"><img src="file:///{str(img_path).replace("\\", "/").lstrip("/")}" /></div>'
+        else:
+            cover_image_html = f'<div class="cover-image-area">IMAGE NOT FOUND</div>'
+    else:
+        cover_image_html = '<div class="cover-image-area">THE EDITORIAL GUIDE</div>'
+
     # Fill template slots
     html = template.replace('{{CSS_CONTENT}}', css_content)
+    html = html.replace('{{COVER_IMAGE}}', cover_image_html)
     html = html.replace('{{TITLE}}', main_title)
     html = html.replace('{{COVER_LABEL}}', 'A Professional Strategic Guide')
     html = html.replace('{{COVER_TAGLINE}}', cover_tagline)
@@ -358,15 +378,14 @@ async def render_pdf(md_path, output_pdf_path=None):
     
     # 1. Extract content
     md_content = md_path.read_text(encoding='utf-8')
-    title, chapters, conclusion_md = extract_structure(md_content)
+    title, chapters, conclusion_md, metadata = extract_structure(md_content)
     
     console.print(f"[bold blue]Title:[/bold blue] {title}")
     console.print(f"[bold blue]Chapters found:[/bold blue] {len(chapters)}")
-    if conclusion_md:
-        console.print(f"[bold blue]Conclusion:[/bold blue] {len(conclusion_md)} chars")
+    console.print(f"[bold blue]Theme:[/bold blue] {metadata.get('theme', 'default')}")
     
     # 2. Assemble HTML
-    html = assemble_html(title, chapters, conclusion_md)
+    html = assemble_html(title, chapters, conclusion_md, metadata)
     
     # 3. Save debug HTML (for manual inspection)
     debug_html_path = output_pdf_path.with_suffix('.debug.html')
