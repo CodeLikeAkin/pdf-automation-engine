@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        {{CSS_CONTENT}}
+        @page {
+            size: A4;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- COVER PAGE                                                    -->
+    <!-- ============================================================ -->
+    <div class="page cover-page">
+        <div class="cover-bg"></div>
+        <div class="cover-decoration">{{COVER_DECORATION_NUM}}</div>
+        <div class="cover-body">
+            <p class="cover-label">{{COVER_LABEL}}</p>
+            <h1 class="cover-title">{{TITLE}}</h1>
+            <div class="cover-rule"></div>
+            <p class="cover-tagline">{{COVER_TAGLINE}}</p>
+            <p class="cover-blurb">{{COVER_BLURB}}</p>
+        </div>
+        <div class="cover-footer">
+            <span class="cover-footer-brand">{{COVER_FOOTER_BRAND}}</span>
+            <span class="cover-footer-edition">{{COVER_FOOTER_EDITION}}</span>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TABLE OF CONTENTS                                             -->
+    <!-- ============================================================ -->
+    <div class="page toc-page">
+        <div class="toc-header">
+            <div class="toc-header-label">Contents</div>
+            <h2 class="toc-title">Table of<br>Contents</h2>
+        </div>
+        {{TOC_CONTENT}}
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MAIN CONTENT (Chapter Openers + Body)                         -->
+    <!-- ============================================================ -->
+    {{MAIN_CONTENT}}
+
+</body>
+</html>

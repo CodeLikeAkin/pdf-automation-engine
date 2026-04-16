@@ -1,0 +1,607 @@
+/* ================================================================
+   SYSTEM V5 — PREMIUM EDITORIAL (Warm Taupe + Gold)
+   Calibrated against professional reference design.
+   Single source of truth — NO inline CSS anywhere else.
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Palette — Warm Taupe + Gold + White */
+    --bg-warm:        #9B8B78;          /* Warm taupe — cover & openers */
+    --bg-warm-light:  #A89888;          /* Slightly lighter taupe */
+    --bg-body:        #FFFFFF;          /* Clean white — body pages */
+    --bg-body-off:    #F9F7F5;          /* Warm off-white for callout bg */
+    --accent:         #C5A55A;          /* Rich gold */
+    --accent-dark:    #B89640;          /* Darker gold for text */
+    --accent-soft:    rgba(197, 165, 90, 0.12);
+    --text-dark:      #2D2A26;          /* Near-black for body */
+    --text-body:      #3D3A36;          /* Warm dark gray for body text */
+    --text-light:     #FFFFFF;          /* White text on taupe bg */
+    --text-light-dim: rgba(255,255,255,0.7);  /* Dimmed white */
+    --text-muted:     #8A8580;          /* Muted warm gray */
+    --border-light:   rgba(0,0,0,0.08); /* Subtle borders on white */
+    --border-warm:    rgba(255,255,255,0.15); /* Subtle borders on taupe */
+    --ghost-color:    rgba(255,255,255,0.12); /* Ghost numbers on taupe */
+
+    /* Typography */
+    --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --font-body:    'Inter', -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* ----------------------------------------------------------------
+   BASE
+   ---------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: var(--font-body);
+    font-size: 10pt;
+    line-height: 1.75;
+    color: var(--text-body);
+    background: var(--bg-body);
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ----------------------------------------------------------------
+   PAGE SCAFFOLDING
+   ---------------------------------------------------------------- */
+.page {
+    width: 210mm;
+    min-height: 297mm;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    page-break-inside: avoid;
+}
+
+/* ================================================================
+   COVER PAGE
+   ================================================================ */
+.cover-page {
+    background: var(--bg-warm);
+    display: flex;
+    flex-direction: column;
+    padding: 45px 50px 0 50px;
+    color: var(--text-light);
+}
+
+.cover-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.06) 100%);
+    z-index: 0;
+}
+
+.cover-decoration {
+    position: absolute;
+    bottom: 40px;
+    right: 15px;
+    font-family: var(--font-display);
+    font-size: 320pt;
+    font-weight: 800;
+    color: var(--ghost-color);
+    line-height: 0.75;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.cover-body {
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+}
+
+.cover-label {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 7pt;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 22px;
+    opacity: 0.85;
+}
+
+.cover-title {
+    font-family: var(--font-display);
+    font-size: 46pt;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--text-light);
+    margin: 0 0 18px 0;
+    letter-spacing: -0.02em;
+    max-width: 85%;
+}
+
+.cover-rule {
+    width: 50px;
+    height: 2.5px;
+    background: var(--accent);
+    margin: 22px 0;
+    border-radius: 2px;
+}
+
+.cover-tagline {
+    font-family: var(--font-display);
+    font-size: 13pt;
+    font-style: italic;
+    color: var(--text-light-dim);
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.cover-blurb {
+    font-family: var(--font-body);
+    font-size: 9pt;
+    color: var(--text-light-dim);
+    line-height: 1.7;
+    max-width: 420px;
+}
+
+/* Cover image placeholder area */
+.cover-image-area {
+    position: relative;
+    z-index: 1;
+    background: rgba(0,0,0,0.08);
+    border-radius: 4px;
+    height: 200px;
+    margin: 30px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light-dim);
+    font-size: 8pt;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.cover-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: transparent;
+    border-top: 1px solid var(--border-warm);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 50px;
+    z-index: 2;
+}
+
+.cover-footer-brand {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 6.5pt;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-light-dim);
+}
+
+.cover-footer-edition {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 6.5pt;
+    letter-spacing: 0.15em;
+    color: var(--text-light-dim);
+    margin-left: 15px;
+}
+
+/* ================================================================
+   TABLE OF CONTENTS
+   ================================================================ */
+.toc-page {
+    background: var(--bg-body);
+    padding: 50px 50px;
+    color: var(--text-dark);
+}
+
+.toc-header {
+    margin-bottom: 40px;
+}
+
+.toc-header-label {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 7pt;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.toc-title {
+    font-family: var(--font-display);
+    font-size: 38pt;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+    line-height: 1.1;
+}
+
+.toc-subtitle {
+    display: none; /* Not used in this style */
+}
+
+/* Part grouping */
+.toc-part {
+    margin-bottom: 28px;
+}
+
+.toc-part-label {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 6.5pt;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--accent);
+}
+
+/* Individual entry */
+.toc-entry {
+    display: flex;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.toc-entry-num {
+    font-family: var(--font-display);
+    font-size: 13pt;
+    font-weight: 700;
+    color: var(--accent-dark);
+    width: 45px;
+    flex-shrink: 0;
+}
+
+.toc-entry-title {
+    flex-grow: 1;
+    font-family: var(--font-body);
+    font-size: 10.5pt;
+    font-weight: 500;
+    color: var(--text-dark);
+    line-height: 1.4;
+}
+
+.toc-entry-dots {
+    display: none; /* Clean style — no dots */
+}
+
+.toc-entry-page {
+    font-family: var(--font-body);
+    font-size: 9pt;
+    font-weight: 400;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    width: 28px;
+    text-align: right;
+}
+
+/* ================================================================
+   CHAPTER OPENER
+   ================================================================ */
+.chapter-opener {
+    background: var(--bg-warm);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 50px 50px 50px;
+    position: relative;
+    width: 210mm;
+    min-height: 297mm;
+    page-break-after: always;
+    page-break-inside: avoid;
+    color: var(--text-light);
+}
+
+.opener-ghost-num {
+    position: absolute;
+    top: 10mm;
+    right: 5mm;
+    font-family: var(--font-display);
+    font-size: 320pt;
+    font-weight: 800;
+    color: var(--ghost-color);
+    line-height: 0.75;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.opener-meta {
+    position: relative;
+    z-index: 1;
+}
+
+.opener-label {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 7pt;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+}
+
+.opener-title {
+    font-family: var(--font-display);
+    font-size: 40pt;
+    font-weight: 700;
+    color: var(--text-light);
+    line-height: 1.08;
+    margin: 0 0 22px 0;
+    letter-spacing: -0.01em;
+    max-width: 80%;
+}
+
+.opener-rule {
+    display: none; /* Reference design doesn't use a rule here */
+}
+
+.opener-desc {
+    font-family: var(--font-body);
+    font-size: 10pt;
+    font-weight: 300;
+    font-style: normal;
+    color: var(--text-light-dim);
+    line-height: 1.65;
+    max-width: 75%;
+}
+
+/* ================================================================
+   CHAPTER HEADER BAR (on body content pages)
+   ================================================================ */
+.chapter-header-bar {
+    background: var(--bg-warm);
+    padding: 14px 45px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 -45px 35px -45px;
+}
+
+.chapter-header-bar-title {
+    font-family: var(--font-display);
+    font-size: 14pt;
+    font-weight: 700;
+    color: var(--text-light);
+}
+
+.chapter-header-bar-meta {
+    font-family: var(--font-body);
+    font-size: 7pt;
+    font-weight: 500;
+    color: var(--text-light-dim);
+    letter-spacing: 0.1em;
+}
+
+.chapter-header-bar-page {
+    font-family: var(--font-body);
+    font-size: 7.5pt;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+}
+
+/* ================================================================
+   BODY CONTENT
+   ================================================================ */
+.chapter-body {
+    padding: 0 45px 55px 45px;
+    background: var(--bg-body);
+}
+
+.chapter-body p {
+    font-size: 10pt;
+    line-height: 1.75;
+    color: var(--text-body);
+    margin-bottom: 1.3em;
+    font-weight: 400;
+}
+
+.chapter-body h3 {
+    font-family: var(--font-display);
+    font-size: 15pt;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-top: 2.2em;
+    margin-bottom: 0.7em;
+}
+
+.chapter-body strong {
+    font-weight: 700;
+    color: var(--accent-dark);
+}
+
+/* ================================================================
+   STRATEGY BOX (Callout / Action Box)
+   ================================================================ */
+.strategy-box {
+    background: var(--bg-body);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 28px 30px;
+    margin: 30px 0;
+    page-break-inside: avoid;
+}
+
+.strategy-box-title {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 7pt;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent);
+}
+
+.strategy-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.strategy-box li {
+    font-size: 9.5pt;
+    line-height: 1.7;
+    color: var(--text-body);
+    margin-bottom: 14px;
+    padding-left: 26px;
+    position: relative;
+}
+
+.strategy-box li::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.strategy-box li strong {
+    color: var(--accent-dark);
+    font-weight: 700;
+}
+
+/* ================================================================
+   BLOCKQUOTES / PULL QUOTES
+   ================================================================ */
+.chapter-body blockquote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 11pt;
+    line-height: 1.65;
+    color: var(--text-body);
+    border: none;
+    padding: 25px 30px;
+    margin: 28px 0;
+    background: var(--bg-body-off);
+    position: relative;
+    border-radius: 4px;
+    page-break-inside: avoid;
+}
+
+.chapter-body blockquote::before {
+    content: '\201C';
+    font-family: var(--font-display);
+    font-size: 48pt;
+    font-weight: 800;
+    display: block;
+    height: 25px;
+    color: var(--accent);
+    opacity: 0.5;
+    line-height: 0.6;
+    margin-bottom: 10px;
+}
+
+.chapter-body blockquote p {
+    font-size: inherit;
+    font-family: inherit;
+    font-style: inherit;
+    color: inherit;
+    margin-bottom: 0.5em;
+}
+
+/* ================================================================
+   KEY INSIGHT BOX (lighter callout)
+   ================================================================ */
+.key-insight {
+    background: var(--bg-body-off);
+    padding: 20px 25px;
+    margin: 25px 0;
+    border-radius: 4px;
+    page-break-inside: avoid;
+}
+
+.key-insight strong:first-child {
+    color: var(--accent-dark);
+}
+
+/* ================================================================
+   TABLES
+   ================================================================ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 9pt;
+    border: 1px solid var(--border-light);
+}
+
+thead th {
+    background: var(--bg-body-off);
+    color: var(--text-dark);
+    text-align: left;
+    padding: 11px 14px;
+    font-family: var(--font-body);
+    text-transform: uppercase;
+    font-size: 7pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    border-bottom: 2px solid var(--accent);
+}
+
+td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-body);
+}
+
+/* ================================================================
+   CONCLUSION
+   ================================================================ */
+.conclusion-page {
+    padding: 55px 45px;
+    background: var(--bg-body);
+}
+
+.conclusion-page h2 {
+    font-family: var(--font-display);
+    font-size: 28pt;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 25px;
+}
+
+.conclusion-page p {
+    font-size: 10pt;
+    line-height: 1.8;
+    color: var(--text-body);
+}
+
+/* ================================================================
+   LISTS (in body content)
+   ================================================================ */
+.chapter-body ul,
+.chapter-body ol {
+    margin: 15px 0;
+    padding-left: 25px;
+}
+
+.chapter-body li {
+    margin-bottom: 8px;
+    font-size: 10pt;
+    line-height: 1.7;
+}
+
+/* ================================================================
+   PRINT
+   ================================================================ */
+@media print {
+    body { background: white; }
+    .page { page-break-after: always; }
+    .chapter-opener { page-break-after: always; }
+    .strategy-box { page-break-inside: avoid; }
+    .chapter-body blockquote { page-break-inside: avoid; }
+}

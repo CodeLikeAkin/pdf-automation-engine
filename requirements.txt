@@ -1,0 +1,9 @@
+playwright
+markdown
+markdown-include
+rich
+python-dotenv
+requests
+Pillow
+fpdf2
+PyPDF2

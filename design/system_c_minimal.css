@@ -1,0 +1,42 @@
+:root {
+  --bg:        #FAFAFA;
+  --accent:    #1A1A1A;
+  --accent2:   #E8A598;
+  --text:      #1A1A1A;
+  --muted:     #888888;
+  --rule:      #E0E0E0;
+  --font-head: 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
+  --font-body: 'Inter', 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 80pt;
+  font-weight: 900;
+  letter-spacing: -4px;
+  line-height: 0.9;
+  margin: 0;
+}
+
+.cover {
+  height: 297mm;
+  padding: 40mm 20mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.content-page {
+  padding: 20mm;
+  border-left: 1px solid var(--rule);
+  margin-left: 10mm;
+}

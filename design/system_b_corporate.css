@@ -1,0 +1,60 @@
+:root {
+  --bg:        #FFFFFF;
+  --accent:    #1B4332;
+  --accent2:   #4CAF70;
+  --text:      #1A1A1A;
+  --muted:     #666666;
+  --light-bg:  #F8F9FA;
+  --font-head: 'Montserrat', 'Arial Black', sans-serif;
+  --font-body: 'Source Sans Pro', Arial, sans-serif;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Source+Sans+Pro:wght@400;600&display=swap');
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-head);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.cover {
+  background: var(--accent);
+  color: #FFFFFF;
+  height: 297mm;
+  padding: 0;
+  position: relative;
+}
+
+.cover-header {
+  padding: 40px;
+}
+
+.cover-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 60px;
+  background: var(--white);
+  color: var(--accent);
+}
+
+.content-page {
+  padding: 15mm 20mm;
+}
+
+.section-header-band {
+  background: var(--accent);
+  color: white;
+  padding: 10mm 20mm;
+  margin: -15mm -20mm 10mm -20mm;
+  border-radius: 0 0 20mm 0;
+}

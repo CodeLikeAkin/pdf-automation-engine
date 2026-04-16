@@ -1,0 +1,21 @@
+# Environment
+.env
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# Output
+output/
+*.pdf
+*.png
+*.debug.html
+
+# Dependencies
+venv/
+node_modules/
+
+# Logs
+logs/
+*.log
