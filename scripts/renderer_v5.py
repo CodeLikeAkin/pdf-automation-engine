@@ -54,10 +54,20 @@ NUMBER_WORDS = {
 }
 
 
-def detect_parts(total_chapters, custom_parts=None):
-    """Return part groupings. Uses custom if provided, else splits into thirds."""
-    if custom_parts:
-        return custom_parts
+def detect_parts(total_chapters, metadata=None):
+    """Return part groupings. Uses metadata if provided, else splits into thirds."""
+    if metadata and 'parts' in metadata:
+        # Expected format: "1-3: Part One Label | 4-7: Part Two Label"
+        try:
+            custom_parts = []
+            parts_raw = metadata['parts'].split('|')
+            for p in parts_raw:
+                range_raw, label = p.split(':', 1)
+                start, end = map(int, range_raw.strip().split('-'))
+                custom_parts.append({"label": label.strip(), "short": label.split('·')[0].strip() if '·' in label else label.strip()[:10], "range": (start, end)})
+            return custom_parts
+        except Exception as e:
+            console.print(f"[yellow]Warning: Could not parse parts metadata: {e}[/yellow]")
     
     if total_chapters <= 4:
         return [{"label": "Chapters", "short": "Part One", "range": (1, total_chapters)}]
@@ -69,9 +79,9 @@ def detect_parts(total_chapters, custom_parts=None):
     p2_end = p1_end + third + (1 if remainder > 1 else 0)
     
     return [
-        {"label": "Part One \u00b7 The Foundation (Birth\u201312 Months)", "short": "Part One", "range": (1, p1_end)},
-        {"label": "Part Two \u00b7 Building Intelligence (1\u20133 Years)", "short": "Part Two", "range": (p1_end + 1, p2_end)},
-        {"label": "Part Three \u00b7 Long-Term Mastery (3+ Years)", "short": "Part Three", "range": (p2_end + 1, total_chapters)},
+        {"label": "Part One \u00b7 The Foundation", "short": "Part One", "range": (1, p1_end)},
+        {"label": "Part Two \u00b7 The Implementation", "short": "Part Two", "range": (p1_end + 1, p2_end)},
+        {"label": "Part Three \u00b7 Long-Term Mastery", "short": "Part Three", "range": (p2_end + 1, total_chapters)},
     ]
 
 
@@ -305,7 +315,7 @@ def assemble_html(title, chapters, conclusion_md, metadata):
     # Actually keep @import inside <style> — Playwright handles it fine
     
     # Determine parts
-    parts = detect_parts(len(chapters))
+    parts = detect_parts(len(chapters), metadata)
     
     # Build content blocks
     toc_html = build_toc_html(chapters, parts)
@@ -382,6 +392,7 @@ async def render_pdf(md_path, output_pdf_path=None):
     
     console.print(f"[bold blue]Title:[/bold blue] {title}")
     console.print(f"[bold blue]Chapters found:[/bold blue] {len(chapters)}")
+    console.print(f"[bold blue]Word Count:[/bold blue] {len(md_content.split())}")
     console.print(f"[bold blue]Theme:[/bold blue] {metadata.get('theme', 'default')}")
     
     # 2. Assemble HTML

@@ -13,6 +13,9 @@ To produce premium, editorial-grade digital guides that feel like high-end physi
    - Balance creativity with the technical stability of the bug fixes already implemented (Visual hierarchy, TOC logic, full-bleed openers).
 3. **No Placeholders**: 
    - All assets should be high-fidelity. Use AI-generated images and curated palettes to maintain a premium feel.
+4. **Depth & Substance**:
+   - Research-based guides must aim for **4,000–5,000 words** total to ensure high value and authority.
+   - Chapters should be expanded with deep research, medical context, and practical "how-to" steps.
 
 ## Technical Guardrails
 - **Zero Inline CSS**: All styling must live in standalone CSS files within `/design`.
