@@ -15,7 +15,9 @@ To produce premium, editorial-grade digital guides that feel like high-end physi
    - All assets should be high-fidelity. Use AI-generated images and curated palettes to maintain a premium feel.
 4. **Depth & Substance**:
    - Research-based guides must aim for **4,000–5,000 words** total to ensure high value and authority.
-   - Chapters should be expanded with deep research, medical context, and practical "how-to" steps.
+   - **Chapter Structure**: Guides must have between **7 and 12 chapters** to maintain focus and attention.
+   - **Chapter Density**: Every chapter must contain at least **300 words**. If a chapter is too short, merge it with a related topic.
+   - **Aesthetic Consistency**: Every chapter, from the opener to the conclusion, must feature aesthetic elements like Strategy Boxes, Pull-quotes, or Data Tables to prevent "visual fatigue."
 
 ## Technical Guardrails
 - **Zero Inline CSS**: All styling must live in standalone CSS files within `/design`.
