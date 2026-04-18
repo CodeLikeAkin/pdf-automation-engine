@@ -7,7 +7,6 @@
         {{CSS_CONTENT}}
         @page {
             size: A4;
-            margin: 0;
         }
     </style>
 </head>
@@ -18,6 +17,7 @@
     <!-- ============================================================ -->
     <div class="page cover-page">
         <div class="cover-bg"></div>
+        {{COVER_IMAGE}}
         <div class="cover-decoration">{{COVER_DECORATION_NUM}}</div>
         <div class="cover-body">
             <p class="cover-label">{{COVER_LABEL}}</p>
@@ -25,11 +25,7 @@
             <div class="cover-rule"></div>
             <p class="cover-tagline">{{COVER_TAGLINE}}</p>
             <p class="cover-blurb">{{COVER_BLURB}}</p>
-            {{COVER_IMAGE}}
-        </div>
-        <div class="cover-footer">
-            <span class="cover-footer-brand">{{COVER_FOOTER_BRAND}}</span>
-            <span class="cover-footer-edition">{{COVER_FOOTER_EDITION}}</span>
+            <p class="cover-author">{{AUTHOR}}</p>
         </div>
     </div>
 

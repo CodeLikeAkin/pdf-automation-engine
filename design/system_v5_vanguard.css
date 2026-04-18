@@ -1,0 +1,429 @@
+/* ================================================================
+   SYSTEM V5 — VANGUARD (Deep Slate Navy + Gold)
+   Calibrated for Professional & Career Guides.
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Palette — Deep Slate Navy + Gold */
+    --bg-dark:        #0F172A;          /* Deep Slate Navy */
+    --bg-dark-light:  #1E293B;          /* Lighter Navy */
+    --bg-body:        #FFFFFF;          /* Clean white for body */
+    --bg-body-off:    #F8FAFC;          /* Near-white for callouts */
+    --accent:         #F59E0B;          /* Vibrant Amber/Gold */
+    --accent-dark:    #D97706;          /* Darker Gold for text */
+    --accent-soft:    rgba(245, 158, 11, 0.1);
+    --text-dark:      #0F172A;          /* Navy for body headings */
+    --text-body:      #334155;          /* Slate for body text */
+    --text-light:     #F8FAFC;          /* Near-white for dark backgrounds */
+    --text-light-dim: rgba(248, 250, 252, 0.7);
+    --text-muted:     #64748B;          /* Muted Slate */
+    --border-light:   rgba(15, 23, 42, 0.08);
+    --border-dark:    rgba(255, 255, 255, 0.1);
+    --ghost-color:    rgba(255, 255, 255, 0.05);
+
+    /* Typography */
+    --font-display: 'Playfair Display', serif;
+    --font-body:    'Inter', sans-serif;
+}
+
+/* ----------------------------------------------------------------
+   BASE
+   ---------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: var(--font-body);
+    font-size: 9.8pt; /* Audit Fix #1 */
+    line-height: 1.75;
+    color: var(--text-body);
+    background: var(--bg-body);
+    margin: 0;
+    padding: 0;
+}
+
+.page {
+    width: 210mm;
+    min-height: 297mm;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+}
+
+/* ================================================================
+   COVER PAGE (Audit Fix #5)
+   ================================================================ */
+.cover-page {
+    background: var(--bg-dark);
+    display: flex;
+    flex-direction: column;
+    padding: 45px 50px 0 50px;
+    color: var(--text-light);
+}
+
+.cover-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 70% 30%, var(--bg-dark-light) 0%, var(--bg-dark) 100%);
+    z-index: 0;
+}
+
+.cover-decoration {
+    position: absolute;
+    bottom: 40px;
+    right: 15px;
+    font-family: var(--font-display);
+    font-size: 320pt;
+    font-weight: 800;
+    color: var(--ghost-color);
+    line-height: 0.75;
+    z-index: 0;
+}
+
+.cover-body {
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+}
+
+.cover-label {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 7.5pt;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 25px;
+}
+
+.cover-title {
+    font-family: var(--font-display);
+    font-size: 46pt; /* Audit Fix #1 */
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--text-light);
+    margin: 0 0 20px 0;
+    letter-spacing: -0.02em;
+}
+
+.cover-rule {
+    width: 60px;
+    height: 3px;
+    background: var(--accent);
+    margin: 25px 0;
+}
+
+.cover-tagline {
+    font-family: var(--font-display);
+    font-size: 14pt;
+    font-style: italic;
+    color: var(--text-light-dim);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.cover-blurb {
+    font-family: var(--font-body);
+    font-size: 9.5pt;
+    color: var(--text-light-dim);
+    line-height: 1.8;
+    max-width: 440px;
+}
+
+.cover-image-area {
+    position: relative;
+    z-index: 1;
+    height: 220px;
+    margin: 35px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-dark);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.cover-image-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cover-footer {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 45px;
+    border-top: 1px solid var(--border-dark);
+    display: flex;
+    align-items: center;
+    padding: 0 50px;
+    z-index: 2;
+}
+
+.cover-footer-brand {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 7pt;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+}
+
+/* ================================================================
+   TABLE OF CONTENTS (Audit Fix #2 & #6)
+   ================================================================ */
+.toc-page {
+    padding: 50px;
+    background: var(--bg-body);
+}
+
+.toc-title {
+    font-family: var(--font-display);
+    font-size: 40pt;
+    color: var(--bg-dark);
+    margin-bottom: 40px;
+}
+
+.toc-part-label {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 7pt;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    margin-top: 30px;
+}
+
+.toc-entry {
+    display: flex;
+    align-items: baseline;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.toc-entry-num {
+    font-family: var(--font-display);
+    font-size: 14pt;
+    font-weight: 800;
+    color: var(--bg-dark);
+    width: 45px;
+}
+
+.toc-entry-title {
+    flex-grow: 1;
+    font-family: var(--font-body);
+    font-size: 10.5pt;
+    font-weight: 500;
+}
+
+.toc-entry-page {
+    font-weight: 600;
+    color: var(--accent-dark);
+    width: 30px;
+    text-align: right;
+}
+
+/* ================================================================
+   CHAPTER OPENER (Audit Fix #3)
+   ================================================================ */
+.chapter-opener {
+    background: var(--bg-dark);
+    min-height: 297mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px 50px;
+    position: relative;
+    color: var(--text-light);
+}
+
+.opener-ghost-num {
+    position: absolute;
+    top: 10mm;
+    right: 5mm;
+    font-family: var(--font-display);
+    font-size: 320pt;
+    font-weight: 800;
+    color: var(--ghost-color);
+    line-height: 0.75;
+}
+
+.opener-label {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 8pt;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    margin-bottom: 15px;
+}
+
+.opener-title {
+    font-family: var(--font-display);
+    font-size: 40pt; /* Audit Fix #1 */
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 25px;
+}
+
+.opener-desc {
+    font-family: var(--font-body);
+    font-size: 10.5pt;
+    font-weight: 300;
+    color: var(--text-light-dim);
+    max-width: 75%;
+    line-height: 1.7;
+}
+
+/* ================================================================
+   BODY CONTENT
+   ================================================================ */
+.chapter-header-bar {
+    background: var(--bg-dark);
+    margin: 0 -45px 40px -45px;
+    padding: 15px 45px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chapter-header-bar-title {
+    color: var(--text-light);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13pt;
+}
+
+.chapter-header-bar-page {
+    color: var(--accent);
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 8pt;
+}
+
+.chapter-body {
+    padding: 0 45px 60px 45px;
+}
+
+.chapter-body p {
+    margin-bottom: 1.5em;
+}
+
+.chapter-body h3 {
+    font-family: var(--font-display);
+    font-size: 16pt;
+    color: var(--bg-dark);
+    margin-top: 2.5em;
+    margin-bottom: 0.8em;
+}
+
+/* ================================================================
+   STRATEGY BOX (Audit Fix #10)
+   ================================================================ */
+.strategy-box {
+    background: var(--bg-body-off);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 30px;
+    margin: 40px 0;
+    page-break-inside: avoid;
+}
+
+.strategy-box-title {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 7.5pt;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--bg-dark);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 10px;
+}
+
+.strategy-box ul {
+    list-style: none;
+    padding: 0;
+}
+
+.strategy-box li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 15px;
+    line-height: 1.7;
+}
+
+.strategy-box li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 7px;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%; /* Gold Dots Audit Fix #10 */
+}
+
+/* ================================================================
+   PULL QUOTES
+   ================================================================ */
+blockquote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 12pt;
+    color: var(--text-body);
+    background: var(--accent-soft);
+    padding: 30px 40px;
+    margin: 40px 0;
+    border: none;
+    border-radius: 4px;
+    page-break-inside: avoid;
+}
+
+blockquote::before {
+    content: '\201C';
+    font-size: 50pt;
+    color: var(--accent);
+    opacity: 0.4;
+    display: block;
+    height: 20px;
+    line-height: 0.6;
+}
+
+/* ================================================================
+   TABLES
+   ================================================================ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+}
+
+th {
+    background: var(--bg-dark);
+    color: var(--text-light);
+    text-align: left;
+    padding: 12px 15px;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+/* ================================================================
+   CONCLUSION
+   ================================================================ */
+.conclusion-page {
+    padding: 60px 50px;
+}
+
+.conclusion-page h2 {
+    font-family: var(--font-display);
+    font-size: 32pt;
+    color: var(--bg-dark);
+    margin-bottom: 30px;
+}

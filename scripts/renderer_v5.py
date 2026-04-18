@@ -31,6 +31,12 @@ from pathlib import Path
 from playwright.async_api import async_playwright
 from rich.console import Console
 
+# Import image fetcher
+try:
+    from fetch_cover_image import fetch_contextual_cover
+except ImportError:
+    fetch_contextual_cover = None
+
 console = Console()
 
 # ============================================================
@@ -155,6 +161,12 @@ def extract_structure(md_content):
             in_conclusion = False
             continue
         
+        # Chapter description — description: ...
+        desc_match = re.match(r'^description:\s*(.+)$', stripped, re.IGNORECASE)
+        if desc_match and current_chapter is not None and len(current_body_lines) < 2:
+             current_chapter['hook'] = desc_match.group(1).strip()
+             continue
+        
         # Conclusion header — ## Conclusion
         conclusion_match = re.match(r'^##\s+Conclusion\b', stripped, re.IGNORECASE)
         if conclusion_match:
@@ -180,8 +192,9 @@ def extract_structure(md_content):
     
     conclusion_md = '\n'.join(conclusion_lines).strip()
     
-    # Extract hooks (first meaningful paragraph, max 120 chars)
+    # Extract hooks (first meaningful paragraph, max 120 chars) if not already set
     for ch in chapters:
+        if ch['hook']: continue
         body = ch['body_md']
         # Find first non-empty paragraph that isn't an HTML block
         paragraphs = re.split(r'\n\s*\n', body)
@@ -217,33 +230,23 @@ def md_to_html(md_text):
 
 
 def build_toc_html(chapters, parts):
-    """Generate the grouped Table of Contents HTML — clean style, no descriptions."""
+    """Generate the TOC structure. Page numbers are filled dynamically by Playwright."""
     html = ""
-    # Page estimation: cover=1, TOC=1, then each chapter = opener(1) + content(1)
-    page_counter = 3  # After cover + TOC
-    
     for part in parts:
         start, end = part['range']
         part_chapters = [ch for ch in chapters if start <= ch['num'] <= end]
-        
-        if not part_chapters:
-            continue
+        if not part_chapters: continue
         
         html += f'<div class="toc-part">\n'
         html += f'  <div class="toc-part-label">{part["label"]}</div>\n'
-        
         for ch in part_chapters:
             num_str = f"{ch['num']:02d}"
-            page_counter += 2  # opener page + content page
-            
             html += f'''  <div class="toc-entry">
     <div class="toc-entry-num">{num_str}</div>
     <div class="toc-entry-title">{ch['title']}</div>
-    <div class="toc-entry-page">{page_counter - 1:02d}</div>
+    <div class="toc-entry-page" id="toc-pg-{ch['num']}">--</div>
   </div>\n'''
-        
         html += '</div>\n'
-    
     return html
 
 
@@ -255,7 +258,7 @@ def build_chapter_html(ch, parts):
     body_html = md_to_html(ch['body_md'])
     
     opener = f'''
-<div class="chapter-opener">
+<div class="chapter-opener" id="ch-opener-{ch['num']}">
     <div class="opener-ghost-num">{num_str}</div>
     <div class="opener-meta">
         <div class="opener-label">Chapter {num_word} &middot; {part_label}</div>
@@ -266,15 +269,17 @@ def build_chapter_html(ch, parts):
 '''
     
     body = f'''
-<div class="chapter-body">
-    <div class="chapter-header-bar">
-        <div>
-            <span class="chapter-header-bar-title">{ch['title']}</span>
-            <span class="chapter-header-bar-meta"> &middot; Neural Foundation</span>
+<div class="page chapter-body-page">
+    <div class="chapter-body">
+        <div class="chapter-header-bar">
+            <div>
+                <span class="chapter-header-bar-title">{ch['title']}</span>
+                <span class="chapter-header-bar-meta"> &middot; {part_label}</span>
+            </div>
+            <span class="chapter-header-bar-page" id="ch-page-label-{ch['num']}">PAGE --</span>
         </div>
-        <span class="chapter-header-bar-page">PAGE {num_str}</span>
+        {body_html}
     </div>
-    {body_html}
 </div>
 '''
     
@@ -336,7 +341,12 @@ def assemble_html(title, chapters, conclusion_md, metadata):
         main_title = title
         cover_tagline = 'A Strategic Guide for Mothers'
     
-    cover_blurb = f"A science-backed framework covering the {len(chapters)} pillars of early childhood cognitive development \u2014 from neural stimulation and language to nutrition, emotional intelligence, and a lifelong love of learning."
+    author = metadata.get('author', 'Dr. Olumide Balogun')
+    
+    if 'cover_blurb' in metadata:
+        cover_blurb = metadata['cover_blurb']
+    else:
+        cover_blurb = f"The Complete 14-Day Nigerian Diet Reset to Reverse Hypertension, Manage Diabetes, and Restore Your Heart Health Without Giving Up the Foods You Love."
     
     # Cover Image logic
     cover_image_html = ""
@@ -354,9 +364,10 @@ def assemble_html(title, chapters, conclusion_md, metadata):
     html = template.replace('{{CSS_CONTENT}}', css_content)
     html = html.replace('{{COVER_IMAGE}}', cover_image_html)
     html = html.replace('{{TITLE}}', main_title)
-    html = html.replace('{{COVER_LABEL}}', 'A Professional Strategic Guide')
+    html = html.replace('{{COVER_LABEL}}', 'A Premium Nigerian Health Guide')
     html = html.replace('{{COVER_TAGLINE}}', cover_tagline)
     html = html.replace('{{COVER_BLURB}}', cover_blurb)
+    html = html.replace('{{AUTHOR}}', author)
     html = html.replace('{{COVER_DECORATION_NUM}}', cover_decoration)
     html = html.replace('{{COVER_FOOTER_BRAND}}', f'{main_title}'.upper())
     html = html.replace('{{COVER_FOOTER_EDITION}}', f'\u00b7 {cover_tagline}'.upper())
@@ -395,6 +406,17 @@ async def render_pdf(md_path, output_pdf_path=None):
     console.print(f"[bold blue]Word Count:[/bold blue] {len(md_content.split())}")
     console.print(f"[bold blue]Theme:[/bold blue] {metadata.get('theme', 'default')}")
     
+    # 1.5 Auto-fetch cover image if missing
+    if 'cover_image' not in metadata and fetch_contextual_cover:
+        console.print("[bold yellow]No cover image found. Attempting contextual auto-fetch...[/bold yellow]")
+        try:
+            image_path = await fetch_contextual_cover(md_path)
+            if image_path:
+                metadata['cover_image'] = image_path
+                console.print(f"[green]Auto-fetched cover:[/green] {image_path}")
+        except Exception as e:
+            console.print(f"[red]Auto-fetch failed: {e}[/red]")
+    
     # 2. Assemble HTML
     html = assemble_html(title, chapters, conclusion_md, metadata)
     
@@ -410,10 +432,38 @@ async def render_pdf(md_path, output_pdf_path=None):
         browser = await p.chromium.launch()
         page = await browser.new_page()
         
-        await page.set_content(html)
+        # Load the file directly instead of set_content
+        # This resolves local asset paths correctly
+        await page.goto(f"file:///{str(debug_html_path).replace('\\', '/')}")
         await page.wait_for_load_state("networkidle")
-        # Extra wait for fonts
-        await page.wait_for_timeout(1500)
+        await page.wait_for_timeout(2000)
+        
+        # 4. DYNAMIC ROUTING — Calculate real page numbers
+        console.print("[bold yellow]Calculating dynamic page numbers...[/bold yellow]")
+        
+        page_data = await page.evaluate("""() => {
+            const results = [];
+            const pageHeight = 1122.5; // Approx height of A4 at 96dpi
+            
+            document.querySelectorAll('.chapter-opener').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const pageNum = Math.ceil((window.scrollY + rect.top + 1) / pageHeight);
+                const chId = el.id.replace('ch-opener-', '');
+                results.push({ id: chId, page: pageNum });
+            });
+            return results;
+        }""")
+        
+        for item in page_data:
+            ch_id = item['id']
+            real_page = f"{item['page']:02d}"
+            await page.evaluate(f"""() => {{
+                const tocEntry = document.getElementById('toc-pg-{ch_id}');
+                if (tocEntry) tocEntry.innerText = '{real_page}';
+                
+                const pageLabel = document.getElementById('ch-page-label-{ch_id}');
+                if (pageLabel) pageLabel.innerText = 'PAGE {real_page}';
+            }}""")
         
         # Screenshot preview
         preview_path = str(output_pdf_path).replace('.pdf', '_preview.png')
@@ -422,8 +472,8 @@ async def render_pdf(md_path, output_pdf_path=None):
         
         # PDF footer — matching warm palette
         footer_template = f"""
-        <div style="font-size: 8px; width: 100%; text-align: center; color: #8A8580; font-family: 'Inter', sans-serif; letter-spacing: 1px; padding-top: 4px;">
-            <span style="color: #C5A55A; font-weight: 700;">PREMIUM EDITORIAL</span>
+        <div style="font-size: 8px; width: 100%; text-align: center; color: #6A7368; font-family: 'Inter', sans-serif; letter-spacing: 1px; padding-top: 4px;">
+            <span style="color: #C04829; font-weight: 700;">PREMIUM EDITORIAL</span>
             &nbsp;&bull;&nbsp; {title}
             &nbsp;&bull;&nbsp; Page <span class="pageNumber"></span> of <span class="totalPages"></span>
         </div>
@@ -436,7 +486,7 @@ async def render_pdf(md_path, output_pdf_path=None):
             display_header_footer=True,
             footer_template=footer_template,
             header_template="<span></span>",
-            margin={"top": "15mm", "bottom": "20mm", "left": "0mm", "right": "0mm"}
+            margin={"top": "25mm", "bottom": "25mm", "left": "0mm", "right": "0mm"}
         )
         
         await browser.close()

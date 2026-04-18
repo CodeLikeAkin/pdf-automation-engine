@@ -1,5 +1,5 @@
 theme: vitality
-cover_image: scripts/assets/covers/taming_the_silent_killer_cover.png
+cover_image: scripts/assets/covers/taming_the_silent_killer_portrait.png
 parts: 1-3: Part One · The Metabolic Science | 4-6: Part Two · The Vitality Kitchen | 7-9: Part Three · Living with Mastery
 
 # Taming the Silent Killer: The Complete 14-Day Nigerian Diet to Reverse Hypertension and Manage Diabetes
@@ -262,3 +262,8 @@ Do not try to change everything in one day. Start with the salt, then the sugar,
 
 ## Conclusion
 A new life awaits you. One where you are not defined by your diagnosis, but by your vitality. Reclaim your plate. Reclaim your health. Reclaim your future. Stay consistent, stay vibrant, and stay healthy.
+
+<div class="strategy-box">
+<div class="strategy-box-title">Medical Disclaimer</div>
+The information provided in this guide is for educational and informational purposes only and is not intended as medical advice. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay in seeking it because of something you have read in this guide. The use of traditional herbs like Bitterleaf, Utazi, or Moringa should be discussed with your doctor, especially if you are currently taking medication for hypertension or diabetes.
+</div>
