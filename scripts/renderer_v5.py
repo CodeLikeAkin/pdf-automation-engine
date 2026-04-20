@@ -30,6 +30,7 @@ import markdown
 from pathlib import Path
 from playwright.async_api import async_playwright
 from rich.console import Console
+import requests
 
 # Import image fetcher
 try:
@@ -58,6 +59,17 @@ NUMBER_WORDS = {
     15: 'Fifteen', 16: 'Sixteen', 17: 'Seventeen', 18: 'Eighteen',
     19: 'Nineteen', 20: 'Twenty'
 }
+
+
+def get_slug(text):
+    """Generate a clean URL-friendly slug from text."""
+    if not text:
+        return "project"
+    # Take only the part before a colon if present
+    base = text.split(':')[0]
+    # Lowercase, replace non-alphanumeric with hyphens, strip trailing hyphens
+    slug = re.sub(r'[^a-z0-9]+', '-', base.lower()).strip('-')
+    return slug or "project"
 
 
 def detect_parts(total_chapters, metadata=None):
@@ -101,6 +113,92 @@ def get_part_for_chapter(ch_num, parts):
 
 
 # ============================================================
+# FONT CACHING
+# ============================================================
+def cache_google_fonts(css_content_or_url):
+    """
+    Downloads Google Fonts CSS if a URL is provided, then downloads font files 
+    locally to assets/fonts/ and replaces remote URLs with local file:/// URIs.
+    """
+    fonts_dir = PROJECT_ROOT / "assets" / "fonts"
+    fonts_dir.mkdir(parents=True, exist_ok=True)
+    
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+
+    is_url = css_content_or_url.startswith('http')
+    
+    try:
+        if is_url:
+            response = requests.get(css_content_or_url, headers=headers, timeout=10)
+            response.raise_for_status()
+            css_content = response.text
+        else:
+            css_content = css_content_or_url
+
+        # Handle @import urls if any (recursive-ish)
+        import_urls = re.findall(r'@import\s+url\([\'"]?(https://fonts\.googleapis\.com/[^)]+)[\'"]?\);', css_content)
+        for i_url in import_urls:
+            cached_style = cache_google_fonts(i_url)
+            # Remove the <style> tags if returned
+            cached_css = cached_style.replace('<style>', '').replace('</style>', '')
+            css_content = css_content.replace(f"@import url('{i_url}');", cached_css)
+            css_content = css_content.replace(f'@import url("{i_url}");', cached_css)
+
+        # Find all font URLs
+        font_urls = re.findall(r'url\((https://fonts\.gstatic\.com/s/[^)]+)\)', css_content)
+        
+        for url in font_urls:
+            parts = url.split('/')
+            filename = "_".join(parts[-3:])
+            local_path = fonts_dir / filename
+            
+            if not local_path.exists():
+                console.print(f"[dim]Caching font:[/dim] {filename}")
+                font_resp = requests.get(url, timeout=10)
+                font_resp.raise_for_status()
+                local_path.write_bytes(font_resp.content)
+            
+            local_uri = f"file:///{str(local_path).replace('\\', '/')}"
+            css_content = css_content.replace(url, local_uri)
+            
+        return f"<style>\n{css_content}\n</style>"
+        
+    except Exception as e:
+        console.print(f"[yellow]Warning: Font caching failed: {e}[/yellow]")
+        if is_url:
+            return f'<link href="{css_content_or_url}" rel="stylesheet">'
+        return f"<style>\n{css_content_or_url}\n</style>"
+
+
+# ============================================================
+# VALIDATION
+# ============================================================
+def validate_metadata(metadata, title):
+    """Checks project metadata for common formatting errors."""
+    warnings = []
+    
+    # Validate project_slug
+    project_slug = metadata.get('project_slug', get_slug(title))
+    if not re.match(r'^[a-z0-9-]+$', project_slug):
+        warnings.append(f"Project slug '{project_slug}' contains invalid characters. Use lowercase and hyphens.")
+    
+    # Validate theme
+    if 'theme' in metadata:
+        theme = metadata['theme']
+        theme_path = PROJECT_ROOT / "design" / f"system_v5_{theme}.css"
+        if not theme_path.exists():
+            warnings.append(f"Theme CSS not found: {theme_path.name}")
+    
+    # Check for common missing fields
+    if 'author' not in metadata:
+        warnings.append("Missing 'author' metadata. Using default.")
+        
+    return warnings
+
+
+# ============================================================
 # MARKDOWN → STRUCTURED DATA (No regex hacks)
 # ============================================================
 def extract_structure(md_content):
@@ -129,9 +227,9 @@ def extract_structure(md_content):
         stripped = line.strip()
         
         # Capture metadata like "theme: vitality"
-        meta_match = re.match(r'^([a-z_]+):\s*(.+)$', line.strip())
+        meta_match = re.match(r'^([a-z_]+)\s*:\s*(.+)$', line.strip())
         if meta_match and current_chapter is None:
-             metadata[meta_match.group(1)] = meta_match.group(2).strip()
+             metadata[meta_match.group(1).lower()] = meta_match.group(2).strip()
              continue
         
         # Main title — # Title
@@ -316,8 +414,50 @@ def assemble_html(title, chapters, conclusion_md, metadata):
         
     # Read CSS content and inject directly
     css_content = theme_css_path.read_text(encoding='utf-8')
-    # Strip @import — we'll add it as a <link> separately handled by font loading
-    # Actually keep @import inside <style> — Playwright handles it fine
+
+    # --- DESIGN SYSTEM INTEGRATION ---
+    design_tokens = ""
+    font_import = ""
+    
+    # Try to find a matching design system based on project name or title
+    project_slug = metadata.get('project_slug', get_slug(title))
+    ds_path = PROJECT_ROOT / "design-system" / project_slug
+    design_system_master = ds_path / "MASTER.md"
+    
+    console.print(f"[dim]Searching for design system at:[/dim] {design_system_master}")
+    
+    if design_system_master.exists():
+        console.print(f"[bold green]Applying Design System:[/bold green] {project_slug}")
+        master_text = design_system_master.read_text(encoding='utf-8')
+        
+        # Extract CSS Variables from the table (Robust version)
+        for line in master_text.split('\n'):
+            if '|' in line and '--' in line:
+                ticks = re.findall(r'`([^`]+)`', line)
+                if len(ticks) >= 2:
+                    var_name = next((t for t in ticks if t.startswith('--')), None)
+                    hex_val = next((t for t in ticks if t.startswith('#')), None)
+                    if var_name and hex_val:
+                        design_tokens += f"    {var_name}: {hex_val};\n"
+            
+        # Extract CSS Import block
+        import_match = re.search(r'```css\n(.*?)\n```', master_text, re.DOTALL)
+        if import_match:
+            font_import = cache_google_fonts(import_match.group(1))
+    else:
+        console.print(f"[bold yellow]Warning: Design System NOT found.[/bold yellow]")
+        console.print(f"   Expected: {design_system_master}")
+        console.print(f"   Fallback: Using default styles.")
+        # Fallback defaults if no design system found
+        design_tokens = """
+            --color-primary: #C04829;
+            --color-secondary: #6A7368;
+            --color-accent: #D4AF37;
+            --color-background: #FDFCFB;
+            --color-foreground: #2A2A2A;
+        """
+        font_import = cache_google_fonts('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700&display=swap')
+    # ---------------------------------
     
     # Determine parts
     parts = detect_parts(len(chapters), metadata)
@@ -361,16 +501,18 @@ def assemble_html(title, chapters, conclusion_md, metadata):
         cover_image_html = '<div class="cover-image-area">THE EDITORIAL GUIDE</div>'
 
     # Fill template slots
-    html = template.replace('{{CSS_CONTENT}}', css_content)
+    html = template.replace('{{FONT_IMPORT}}', font_import)
+    html = html.replace('{{DESIGN_TOKENS}}', design_tokens)
+    html = html.replace('{{CSS_CONTENT}}', css_content)
     html = html.replace('{{COVER_IMAGE}}', cover_image_html)
     html = html.replace('{{TITLE}}', main_title)
-    html = html.replace('{{COVER_LABEL}}', 'A Premium Nigerian Health Guide')
+    html = html.replace('{{COVER_LABEL}}', metadata.get('cover_label', 'A Premium Nigerian Legal Guide'))
     html = html.replace('{{COVER_TAGLINE}}', cover_tagline)
     html = html.replace('{{COVER_BLURB}}', cover_blurb)
     html = html.replace('{{AUTHOR}}', author)
     html = html.replace('{{COVER_DECORATION_NUM}}', cover_decoration)
     html = html.replace('{{COVER_FOOTER_BRAND}}', f'{main_title}'.upper())
-    html = html.replace('{{COVER_FOOTER_EDITION}}', f'\u00b7 {cover_tagline}'.upper())
+    html = html.replace('{{COVER_FOOTER_EDITION}}', f'{cover_tagline}'.upper())
     html = html.replace('{{TOC_CONTENT}}', toc_html)
     html = html.replace('{{MAIN_CONTENT}}', main_content)
     
@@ -401,6 +543,11 @@ async def render_pdf(md_path, output_pdf_path=None):
     md_content = md_path.read_text(encoding='utf-8')
     title, chapters, conclusion_md, metadata = extract_structure(md_content)
     
+    # 1.2 Validate metadata
+    warnings = validate_metadata(metadata, title)
+    for w in warnings:
+        console.print(f"[bold yellow]Validation Warning:[/bold yellow] {w}")
+    
     console.print(f"[bold blue]Title:[/bold blue] {title}")
     console.print(f"[bold blue]Chapters found:[/bold blue] {len(chapters)}")
     console.print(f"[bold blue]Word Count:[/bold blue] {len(md_content.split())}")
@@ -408,14 +555,25 @@ async def render_pdf(md_path, output_pdf_path=None):
     
     # 1.5 Auto-fetch cover image if missing
     if 'cover_image' not in metadata and fetch_contextual_cover:
-        console.print("[bold yellow]No cover image found. Attempting contextual auto-fetch...[/bold yellow]")
-        try:
-            image_path = await fetch_contextual_cover(md_path)
-            if image_path:
-                metadata['cover_image'] = image_path
-                console.print(f"[green]Auto-fetched cover:[/green] {image_path}")
-        except Exception as e:
-            console.print(f"[red]Auto-fetch failed: {e}[/red]")
+        project_slug = metadata.get('project_slug', get_slug(title))
+        
+        # Check cache first
+        covers_dir = PROJECT_ROOT / "assets" / "covers"
+        cached_path = covers_dir / f"{project_slug}.jpg"
+        
+        if cached_path.exists():
+            metadata['cover_image'] = str(cached_path)
+            console.print(f"[green]Using cached cover:[/green] {cached_path.name}")
+        else:
+            console.print("[bold yellow]No cover image found. Attempting contextual auto-fetch...[/bold yellow]")
+            try:
+                # Pass the slug so fetch_cover_image can use it for the filename
+                image_path = await fetch_contextual_cover(md_path, slug=project_slug)
+                if image_path:
+                    metadata['cover_image'] = image_path
+                    console.print(f"[green]Auto-fetched cover:[/green] {Path(image_path).name}")
+            except Exception as e:
+                console.print(f"[red]Auto-fetch failed: {e}[/red]")
     
     # 2. Assemble HTML
     html = assemble_html(title, chapters, conclusion_md, metadata)
@@ -436,7 +594,7 @@ async def render_pdf(md_path, output_pdf_path=None):
         # This resolves local asset paths correctly
         await page.goto(f"file:///{str(debug_html_path).replace('\\', '/')}")
         await page.wait_for_load_state("networkidle")
-        await page.wait_for_timeout(2000)
+        await page.evaluate("document.fonts.ready")
         
         # 4. DYNAMIC ROUTING — Calculate real page numbers
         console.print("[bold yellow]Calculating dynamic page numbers...[/bold yellow]")

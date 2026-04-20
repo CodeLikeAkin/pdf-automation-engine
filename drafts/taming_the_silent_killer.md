@@ -1,5 +1,7 @@
+project_slug: taming-the-silent-killer
+author: Dr. Olumide Balogun
 theme: vitality
-cover_image: scripts/assets/covers/taming_the_silent_killer_portrait.png
+cover_image: assets/covers/taming_the_silent_killer_portrait.png
 parts: 1-3: Part One · The Metabolic Science | 4-6: Part Two · The Vitality Kitchen | 7-9: Part Three · Living with Mastery
 
 # Taming the Silent Killer: The Complete 14-Day Nigerian Diet to Reverse Hypertension and Manage Diabetes

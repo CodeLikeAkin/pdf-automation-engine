@@ -32,9 +32,8 @@ async def main():
 
     # 2. Update the Markdown metadata
     content = md_path.read_text(encoding="utf-8")
-    
-    # Check if cover_image already exists
-    relative_img_path = os.path.relpath(image_path, md_path.parent).replace("\\", "/")
+    project_root = Path(__file__).parent.parent
+    relative_img_path = os.path.relpath(image_path, project_root).replace("\\", "/")
     
     if "cover_image:" in content:
         # Replace existing

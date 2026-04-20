@@ -20,7 +20,7 @@ console = Console()
 
 UNSPLASH_ACCESS_KEY = os.getenv("UNSPLASH_ACCESS_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-COVERS_DIR = os.path.join(os.path.dirname(__file__), "assets", "covers")
+COVERS_DIR = (Path(__file__).parent.parent / "assets" / "covers").resolve()
 
 async def call_gemini(prompt, attempt=1):
     """Simple Gemini API caller for search queries with retry logic."""
@@ -50,20 +50,17 @@ async def call_gemini(prompt, attempt=1):
         return None
 
 
-def fetch_cover_image(query, orientation="portrait"):
-    """
-    Searches Unsplash for a photo matching the query and downloads it.
-    
-    Args:
-        query: Search term (e.g., "networking", "new mom", "fitness")
-        orientation: "portrait" (recommended for PDF covers) or "landscape"
-    
-    Returns:
-        Absolute path to the downloaded image, or None if failed.
-    """
+def fetch_cover_image(query, orientation="portrait", **kwargs):
     os.makedirs(COVERS_DIR, exist_ok=True)
-    slug = query.lower().replace(" ", "_").replace("'", "")
-    filepath = os.path.join(COVERS_DIR, f"{slug}.jpg")
+    
+    # If a specific project slug is provided, use it for the filename
+    # otherwise fallback to a slugified version of the query
+    if kwargs.get('slug'):
+        filename_slug = kwargs.get('slug')
+    else:
+        filename_slug = query.lower().replace(" ", "_").replace("'", "")
+        
+    filepath = os.path.join(COVERS_DIR, f"{filename_slug}.jpg")
 
     # If we already have this cover, reuse it
     if os.path.exists(filepath):
@@ -140,7 +137,7 @@ def fetch_cover_image(query, orientation="portrait"):
         return None
 
 
-async def fetch_contextual_cover(md_path, orientation="portrait"):
+async def fetch_contextual_cover(md_path, orientation="portrait", slug=None):
     """
     Analyzes a Markdown file and fetches a relevant cover image from Unsplash.
     """
@@ -184,7 +181,7 @@ async def fetch_contextual_cover(md_path, orientation="portrait"):
         query = " ".join(words[:3]) if words else title
     
     query = query.strip().strip('"').strip("'")
-    return fetch_cover_image(query, orientation)
+    return fetch_cover_image(query, orientation, slug=slug)
 
 
 if __name__ == "__main__":

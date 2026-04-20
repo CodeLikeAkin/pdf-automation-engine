@@ -1,0 +1,352 @@
+/* ================================================================
+   SYSTEM V5 — VANGUARD SECURITY PRO MAX
+   Calibrated: Midnight Navy + 24k Gold
+   Principles: 8pt Grid, Personality/Utility Type Pairing, Editorial Density
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* 8pt Grid System */
+    --grid-unit: 8px;
+    --sp-1: calc(1 * var(--grid-unit));
+    --sp-2: calc(2 * var(--grid-unit));
+    --sp-3: calc(3 * var(--grid-unit));
+    --sp-4: calc(4 * var(--grid-unit));
+    --sp-6: calc(6 * var(--grid-unit));
+    --sp-8: calc(8 * var(--grid-unit));
+    --sp-12: calc(12 * var(--grid-unit));
+
+    /* Palette — Midnight Navy + 24k Gold */
+    --bg-warm: #000F2E;        /* Midnight Navy */
+    --bg-warm-light: #001A4D;  /* Lighter Midnight */
+    --bg-body: #FFFFFF;
+    --bg-body-off: #F8FAFC;    /* Ultra-light Slate */
+    --accent: #D4AF37;         /* 24k Gold */
+    --accent-dark: #B8860B;
+    --accent-soft: rgba(212, 175, 55, 0.08);
+    --text-dark: #000F2E;
+    --text-body: #1E293B;      /* Slate Blue Body */
+    --text-light: #FFFFFF;
+    --text-light-dim: rgba(255, 255, 255, 0.65);
+    --text-muted: #64748B;
+    --border-light: rgba(0, 15, 46, 0.08);
+    --border-warm: rgba(255, 255, 255, 0.12);
+    --ghost-color: rgba(255, 255, 255, 0.04);
+
+    /* Typography Hierarchy */
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+    
+    --h1-size: 48pt;
+    --h2-size: 24pt;
+    --h3-size: 16pt;
+    --body-size: 10.5pt;
+    --body-lh: 1.65;
+}
+
+/* ----------------------------------------------------------------
+   BASE & GRID
+   ---------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: var(--font-body);
+    font-size: var(--body-size);
+    line-height: var(--body-lh);
+    color: var(--text-body);
+    background: var(--bg-body);
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+@page { margin: 25mm 0; }
+@page full-bleed { margin: 0; }
+@page :first { margin: 0; }
+
+.page {
+    position: relative;
+    break-before: page;
+    page-break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+}
+
+/* ================================================================
+   COVER PAGE — PRO MAX
+   ================================================================ */
+.cover-page {
+    background: var(--bg-warm);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--sp-8);
+    color: var(--text-light);
+    min-height: 297mm;
+    page: full-bleed;
+}
+
+.cover-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, rgba(0, 15, 46, 0.7) 0%, rgba(0, 15, 46, 0.3) 50%, rgba(0, 15, 46, 0.85) 100%);
+    z-index: 1;
+}
+
+.cover-body {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cover-label {
+    font-weight: 800;
+    font-size: 10pt;
+    letter-spacing: 0.8em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: var(--sp-6);
+}
+
+.cover-title {
+    font-family: var(--font-display);
+    font-size: 64pt;
+    font-weight: 900;
+    line-height: 0.95;
+    margin-bottom: var(--sp-4);
+    letter-spacing: -0.03em;
+    text-shadow: 0 12px 40px rgba(0,0,0,0.7);
+}
+
+.cover-rule {
+    width: 100px;
+    height: 4px;
+    background: var(--accent);
+    margin: var(--sp-4) 0;
+}
+
+.cover-tagline {
+    font-size: 22pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    margin-bottom: var(--sp-4);
+}
+
+.cover-blurb {
+    font-size: 12.5pt;
+    color: var(--text-light-dim);
+    line-height: 1.7;
+    max-width: 580px;
+    margin-bottom: var(--sp-6);
+}
+
+.cover-author {
+    font-family: var(--font-display);
+    font-size: 24pt;
+    font-weight: 700;
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--accent);
+}
+
+.cover-image-area {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+}
+
+.cover-image-area img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: brightness(0.55) contrast(1.1);
+}
+
+/* ================================================================
+   CHAPTER OPENER — PRO MAX
+   ================================================================ */
+.chapter-opener {
+    background: var(--bg-warm);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--sp-12) var(--sp-8);
+    color: var(--text-light);
+    min-height: 297mm;
+    page: full-bleed;
+}
+
+.opener-ghost-num {
+    position: absolute;
+    top: 10mm;
+    right: 10mm;
+    font-family: var(--font-display);
+    font-size: 450pt;
+    font-weight: 900;
+    color: var(--ghost-color);
+    line-height: 0.75;
+}
+
+.opener-meta {
+    position: relative;
+    z-index: 1;
+    border-left: 12px solid var(--accent);
+    padding-left: var(--sp-4);
+}
+
+.opener-label {
+    font-weight: 700;
+    font-size: 9pt;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: var(--sp-3);
+}
+
+.opener-title {
+    font-family: var(--font-display);
+    font-size: 52pt;
+    font-weight: 800;
+    line-height: 1.0;
+    margin: 0;
+}
+
+/* ================================================================
+   BODY CONTENT — PRO MAX
+   ================================================================ */
+.chapter-body {
+    padding: var(--sp-8);
+}
+
+/* Drop Cap for Chapters */
+.chapter-body > p:first-of-type::first-letter {
+    font-family: var(--font-display);
+    font-size: 56pt;
+    float: left;
+    line-height: 0.8;
+    margin-top: var(--sp-1);
+    margin-right: var(--sp-2);
+    color: var(--bg-warm);
+    font-weight: 900;
+}
+
+.chapter-body h2 {
+    font-family: var(--font-display);
+    font-size: var(--h2-size);
+    color: var(--bg-warm);
+    margin-top: var(--sp-8);
+    margin-bottom: var(--sp-3);
+    border-bottom: 4px solid var(--accent-soft);
+}
+
+.chapter-body h3 {
+    font-family: var(--font-display);
+    font-size: var(--h3-size);
+    color: var(--bg-warm);
+    margin-top: var(--sp-6);
+}
+
+/* TACTICAL CHECKLIST (Glassmorphism) */
+.strategy-box {
+    background: var(--bg-warm);
+    color: var(--text-light);
+    padding: var(--sp-6);
+    margin: var(--sp-6) 0;
+    border-left: 8px solid var(--accent);
+    box-shadow: 0 10px 30px rgba(0, 15, 46, 0.15);
+}
+
+.strategy-box-title {
+    font-weight: 800;
+    font-size: 9pt;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: var(--sp-4);
+    border-bottom: 1px solid var(--border-warm);
+    padding-bottom: var(--sp-2);
+}
+
+.strategy-box li {
+    padding-left: var(--sp-4);
+    margin-bottom: var(--sp-2);
+    position: relative;
+    list-style: none;
+}
+
+.strategy-box li::before {
+    content: '\2713';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 900;
+}
+
+/* PULL QUOTE — Premium */
+blockquote {
+    font-family: var(--font-display);
+    font-size: 15pt;
+    font-style: italic;
+    color: var(--bg-warm);
+    background: var(--bg-body-off);
+    border-right: 8px solid var(--accent);
+    padding: var(--sp-4) var(--sp-6);
+    margin: var(--sp-6) 0;
+    position: relative;
+}
+
+blockquote::before {
+    content: '\201C';
+    font-size: 64pt;
+    color: var(--accent);
+    opacity: 0.3;
+    position: absolute;
+    top: -20px;
+    left: 10px;
+}
+
+/* TABLE OF CONTENTS — Pro Max */
+.toc-page {
+    padding: var(--sp-8);
+}
+
+.toc-title {
+    font-family: var(--font-display);
+    font-size: 42pt;
+    color: var(--bg-warm);
+    margin-bottom: var(--sp-6);
+    border-bottom: 12px solid var(--accent);
+    display: inline-block;
+}
+
+.toc-entry {
+    display: flex;
+    align-items: baseline;
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.toc-entry-num {
+    font-weight: 800;
+    color: var(--accent-dark);
+    width: 60px;
+}
+
+.toc-entry-title {
+    font-weight: 600;
+    flex-grow: 1;
+}
+
+/* FOOTER BAR */
+.chapter-header-bar {
+    background: var(--bg-warm);
+    margin: 0 calc(-1 * var(--sp-8)) var(--sp-6) calc(-1 * var(--sp-8));
+    padding: var(--sp-2) var(--sp-8);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chapter-header-bar-title { color: var(--text-light); font-weight: 700; }
+.chapter-header-bar-page { color: var(--accent); font-weight: 900; }

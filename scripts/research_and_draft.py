@@ -169,12 +169,16 @@ async def phase_write():
         # Delay to avoid burst limits
         await asyncio.sleep(5)
 
+    filename = f"{topic.lower().replace(' ', '_')}.md"
+    filepath = os.path.join("drafts", filename)
+    os.makedirs("drafts", exist_ok=True)
+
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(full_md)
 
     console.print(f"\n[bold green]Phase 2 Complete![/bold green]")
     console.print(f"Guide saved to: {filepath}")
-    console.print(f"[yellow]ACTION REQUIRED:[/yellow] Review the Markdown file. If happy, run the PDF renderer.")
+    console.print(f"[yellow]ACTION REQUIRED:[/yellow] Review the Markdown file. If happy, run: [bold]python scripts/renderer_v5.py {filepath}[/bold]")
 
 
 async def main():

@@ -2,22 +2,24 @@
 
 In this room, we focus on the visual quality and premium feel of the final output. We don't just "convert" text; we **design** digital experiences.
 
+## Architecture: The "Design System"
+- **Master Rules**: Each project uses a `design-system/[project-slug]/MASTER.md` file for custom tokens and fonts.
+- **Renderer V5**: Automatically detects and applies these design systems based on the `project_slug`.
+- **Local Assets**: All fonts are cached locally in `assets/fonts/` to ensure typography is consistent and renders perfectly without internet dependence.
+
 ## What "Premium" Looks Like
-- **Typography**: Use high-quality Google Fonts (Inter, Playfair Display, Montserrat). Avoid browser defaults.
-- **Hierarchy**: Large, bold headers with subtle letter spacing.
-- **Whitespace**: Generous margins and line heights (1.6 - 1.8).
-- **Accents**: Subtle dividers, blockquotes with left-border accents, and stylized page numbers.
-- **Colors**: Never use pure black (#000) or pure red. Use curated palettes (e.g., Deep Charcoal #1a1a1a, Soft Slate #334155).
+- **Typography**: High-quality Google Fonts (Inter, Playfair Display, Montserrat). Now fully cached locally.
+- **Hierarchy**: Clear type scale (46pt covers, 40pt chapter headers, 9.8pt body).
+- **Structure**: Dedicated full-bleed chapter openers with ghost numbering.
+- **Accents**: Gold-accented strategy boxes, stylized TOC with numbered entries, and premium footers.
 
 ## The Production Chain
-1. **Source**: Markdown files from `/drafts`.
-2. **Logic**: Pull rules from `skills/ui-ux-pro-max.md`.
-3. **Drafting**: Use Python script in `/scripts`.
-4. **Template**: CSS files in this folder (`premium-main.css`).
-5. **Output**: Finished file in `/output`.
+1. **Source**: Markdown files with metadata headers.
+2. **Logic**: Renderer V5 pulls tokens from `MASTER.md`.
+3. **Template**: Clean HTML/CSS architecture (`template_v5.html` + `system_v5_*.css`).
+4. **Rendering**: Playwright-driven capture with `networkidle` and font-loading guarantees.
 
-## Design Checklist for Claude
-- Does the font match the topic? (Playfair for Health, Inter for Tech).
-- Is the line height comfortable for long reading?
-- Are the images (if any) high-resolution and properly aligned?
-- Is there a clear Legal Disclaimer on the first page?
+## Design Checklist
+- Does the `project_slug` match the `design-system` folder name?
+- Are the primary/secondary colors defined as CSS variables in `MASTER.md`?
+- Is the cover blurb optimized for the target market?
